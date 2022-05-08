@@ -6,8 +6,6 @@ import com.example.fakeebay.entity.Address;
 import com.example.fakeebay.entity.User;
 import com.example.fakeebay.exceptions.AddressNotFoundException;
 import com.example.fakeebay.exceptions.UserNameNotFoundException;
-import com.example.fakeebay.mapper.AddressMapper;
-import com.example.fakeebay.mapper.UserMapper;
 import com.example.fakeebay.messages.ErrorMessage;
 import com.example.fakeebay.messages.ResponseMessage;
 import com.example.fakeebay.exceptions.UserAllreadyExistsException;
@@ -28,11 +26,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    AddressMapper addressMapper;
 
     @Autowired
     private ModelMapper modelMapper;
