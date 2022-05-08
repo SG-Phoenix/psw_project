@@ -1,8 +1,10 @@
 package com.example.fakeebay.controller;
 
 import com.example.fakeebay.dto.OrderDto;
+import com.example.fakeebay.dto.OrderLineDto;
 import com.example.fakeebay.dto.PurchaseDto;
 import com.example.fakeebay.entity.Order;
+import com.example.fakeebay.entity.OrderLine;
 import com.example.fakeebay.entity.Product;
 import com.example.fakeebay.entity.User;
 import com.example.fakeebay.exceptions.OrderNotFoundException;
@@ -21,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -46,8 +49,10 @@ public class OrderController {
     {
         try
         {
-            Order order = modelMapper.map(orderDto, Order.class);
+            List<OrderLine> orderLineList = orderDto.getProductsList().stream().map(orderLineDto -> modelMapper.map(orderLineDto, OrderLine.class)).collect(Collectors.toList());
 
+            Order order = modelMapper.map(orderDto, Order.class);
+            order.setProductsList(orderLineList);
             return new ResponseEntity(orderService.createOrder(order), HttpStatus.CREATED);
         }catch(ProductNotFoundException e)
         {
@@ -82,7 +87,7 @@ public class OrderController {
     @GetMapping
     public ResponseEntity getAllOrders()
     {
-        return new ResponseEntity(orderService.getAllOrders(),HttpStatus.OK);
+        return new ResponseEntity(orderService.getAllOrders().stream().map(order -> modelMapper.map(order, OrderDto.class)),HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}")

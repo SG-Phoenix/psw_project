@@ -26,7 +26,7 @@ public class OrderLine
     private Integer quantity;
 
     @Column(name = "purchase_price")
-    private Float purcasePrice;
+    private Float purchasePrice;
 
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "product_id", updatable = false)

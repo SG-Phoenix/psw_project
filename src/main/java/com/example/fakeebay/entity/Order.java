@@ -1,5 +1,6 @@
 package com.example.fakeebay.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -25,10 +26,10 @@ public class Order
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.MERGE)
+    @JsonProperty(value = "products")
     private List<OrderLine> productsList;
 
     @CreationTimestamp

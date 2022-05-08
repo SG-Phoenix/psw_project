@@ -22,7 +22,7 @@ public class OrderDto
     private Long id;
     private Long userId;
     @JsonProperty(value = "products")
-    private List<OrderLineDto> productsInOrder;
+    private List<OrderLineDto> productsList;
     @JsonProperty(value = "purchase_time")
     private Date createDate;
 
