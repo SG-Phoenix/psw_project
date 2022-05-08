@@ -1,5 +1,6 @@
 package com.example.fakeebay.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class ProductDto {
     private String description;
     private float price;
     private int quantity;
+    @JsonProperty(value = "userId")
     private Long userId;
 
 }

@@ -1,6 +1,7 @@
 package com.example.fakeebay.controller;
 
 import com.example.fakeebay.dto.OrderDto;
+import com.example.fakeebay.dto.PurchaseDto;
 import com.example.fakeebay.entity.Order;
 import com.example.fakeebay.entity.Product;
 import com.example.fakeebay.entity.User;
@@ -8,9 +9,6 @@ import com.example.fakeebay.exceptions.OrderNotFoundException;
 import com.example.fakeebay.exceptions.ProductNotEnoughtQuantity;
 import com.example.fakeebay.exceptions.ProductNotFoundException;
 import com.example.fakeebay.exceptions.UserIdNotFoundException;
-import com.example.fakeebay.mapper.OrderLineMapper;
-import com.example.fakeebay.mapper.OrderMapper;
-import com.example.fakeebay.mapper.PurchaseMapper;
 import com.example.fakeebay.messages.ErrorMessage;
 import com.example.fakeebay.service.OrderService;
 import com.example.fakeebay.service.ProductService;
@@ -36,13 +34,6 @@ public class OrderController {
     private UserService userService;
 
     @Autowired
-    private OrderMapper orderMapper;
-
-
-    @Autowired
-    private PurchaseMapper purchaseMapper;
-
-    @Autowired
     private ProductService productService;
 
 
@@ -55,7 +46,7 @@ public class OrderController {
     {
         try
         {
-            Order order = orderMapper.convertDtoToEntity(orderDto);
+            Order order = modelMapper.map(orderDto, Order.class);
 
             return new ResponseEntity(orderService.createOrder(order), HttpStatus.CREATED);
         }catch(ProductNotFoundException e)
@@ -91,8 +82,7 @@ public class OrderController {
     @GetMapping
     public ResponseEntity getAllOrders()
     {
-        return new ResponseEntity(orderService.getAllOrders().stream().map(post -> modelMapper.map(post, OrderDto.class))
-                .collect(Collectors.toList()),HttpStatus.OK);
+        return new ResponseEntity(orderService.getAllOrders(),HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}")
@@ -115,7 +105,7 @@ public class OrderController {
         {
             Product product = productService.getProductById(id);
 
-            return new ResponseEntity(orderService.getPurchasesByProduct(product).stream().map(purchaseMapper::convertEntityToDto).collect(Collectors.toList()),HttpStatus.OK);
+            return new ResponseEntity(orderService.getPurchasesByProduct(product).stream().map(order -> modelMapper.map(order, PurchaseDto.class)).collect(Collectors.toList()),HttpStatus.OK);
 
         }catch(ProductNotFoundException e)
         {
@@ -130,7 +120,7 @@ public class OrderController {
         try
         {
             User user = userService.getUserById(id);
-            return new ResponseEntity(orderService.getPurchasesByUser(user).stream().map(purchaseMapper::convertEntityToDto).collect(Collectors.toList()), HttpStatus.OK);
+            return new ResponseEntity(orderService.getPurchasesByUser(user).stream().map(order -> modelMapper.map(order, PurchaseDto.class)).collect(Collectors.toList()), HttpStatus.OK);
 
         }catch(UserIdNotFoundException e)
         {
