@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,9 +50,23 @@ public class OrderController {
     {
         try
         {
-            List<OrderLine> orderLineList = orderDto.getProductsList().stream().map(orderLineDto -> modelMapper.map(orderLineDto, OrderLine.class)).collect(Collectors.toList());
-
             Order order = modelMapper.map(orderDto, Order.class);
+
+            User user = userService.getUserById(orderDto.getUserId());
+            List<OrderLine> orderLineList = new ArrayList<>();
+            for(OrderLineDto old : orderDto.getProductsList())
+            {
+                OrderLine ol = modelMapper.map(old, OrderLine.class);
+                Product product = productService.getProductById(old.getProductId());
+                ol.setProduct(product);
+                ol.setOrder(order);
+                ol.setPurchasePrice(product.getPrice());
+
+                orderLineList.add(ol);
+
+
+            }
+            order.setUser(user);
             order.setProductsList(orderLineList);
             return new ResponseEntity(orderService.createOrder(order), HttpStatus.CREATED);
         }catch(ProductNotFoundException e)
