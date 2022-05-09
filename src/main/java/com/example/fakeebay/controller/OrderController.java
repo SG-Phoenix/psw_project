@@ -99,10 +99,39 @@ public class OrderController {
         }
     }
 
+    @GetMapping(path = "user/{id}/paged")
+    public ResponseEntity getOrdersByUserPaged(@PathVariable Long id,
+                                          @RequestParam(value = "fromDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
+                                          @RequestParam(value = "toDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate,
+                                          @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                          @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
+                                            )
+    {
+        try
+        {
+            User user = userService.getUserById(id);
+            return new ResponseEntity(orderService.getAllUserOrders(user, fromDate, toDate, page, pageSize, sortBy), HttpStatus.OK);
+        }catch(UserIdNotFoundException e)
+        {
+            return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping
     public ResponseEntity getAllOrders()
     {
         return new ResponseEntity(orderService.getAllOrders().stream().map(order -> modelMapper.map(order, OrderDto.class)),HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/paged")
+    public ResponseEntity getAllOrdersPaged(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
+    )
+    {
+        return new ResponseEntity(orderService.getAllOrders(page, pageSize, sortBy).stream().map(order -> modelMapper.map(order, OrderDto.class)),HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}")
@@ -134,6 +163,25 @@ public class OrderController {
 
     }
 
+    @GetMapping(path = "/purchases/by-product/{id}/paged")
+    public ResponseEntity getProductPurchasesPaged(@PathVariable Long id,
+                                                   @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                   @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                                   @RequestParam(name = "sortBy", defaultValue = "id") String sortBy)
+    {
+        try
+        {
+            Product product = productService.getProductById(id);
+
+            return new ResponseEntity(orderService.getPurchasesByProduct(product, page, pageSize, sortBy).stream().map(order -> modelMapper.map(order, PurchaseDto.class)).collect(Collectors.toList()),HttpStatus.OK);
+
+        }catch(ProductNotFoundException e)
+        {
+            return new ResponseEntity(new ErrorMessage("ERROR_PRODUCT_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
     @GetMapping(path = "/purchases/by-user/{id}")
     public ResponseEntity getUserPurchases(@PathVariable Long id)
     {
@@ -148,6 +196,24 @@ public class OrderController {
         }
 
     }
+    @GetMapping(path = "/purchases/by-user/{id}/paged")
+    public ResponseEntity getUserPurchasesPaged(@PathVariable Long id,
+                                                @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                                @RequestParam(name = "sortBy", defaultValue = "id") String sortBy)
+    {
+        try
+        {
+            User user = userService.getUserById(id);
+            return new ResponseEntity(orderService.getPurchasesByUser(user,page, pageSize, sortBy).stream().map(order -> modelMapper.map(order, PurchaseDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+
+        }catch(UserIdNotFoundException e)
+        {
+            return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
 
 
 
