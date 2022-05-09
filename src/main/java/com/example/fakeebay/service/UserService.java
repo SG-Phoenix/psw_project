@@ -1,6 +1,7 @@
 package com.example.fakeebay.service;
 
 import com.example.fakeebay.entity.Address;
+import com.example.fakeebay.entity.Product;
 import com.example.fakeebay.entity.User;
 import com.example.fakeebay.exceptions.AddressNotFoundException;
 import com.example.fakeebay.exceptions.UserAllreadyExistsException;
@@ -9,9 +10,14 @@ import com.example.fakeebay.exceptions.UserIdNotFoundException;
 import com.example.fakeebay.repository.AddressRepository;
 import com.example.fakeebay.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,6 +80,18 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public List<User> getAllUsers(int page, int pageSize, String sortBy) {
+        Pageable pageable = PageRequest.of(page,pageSize, Sort.by(sortBy));
+        Page<User> pagedResult = userRepository.findAll(pageable);
+        if ( pagedResult.hasContent() ) {
+            return pagedResult.getContent();
+        }
+        else {
+            return new ArrayList<>();
+        }
+    }
+
     @Transactional
     public void deleteUser(User user) {
             userRepository.delete(user);
@@ -101,6 +119,19 @@ public class UserService {
     {   if(!userRepository.existsById(user.getId()))
         throw new UserIdNotFoundException(user.getId());
         return addressRepository.findAddressesByUser(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Address> getAllUserAddresses(User user, int page, int pageSize, String sortBy) throws UserIdNotFoundException
+    {
+        Pageable pageable = PageRequest.of(page,pageSize, Sort.by(sortBy));
+        Page<Address> pagedResult = addressRepository.findAddressesByUser(user, pageable);
+        if ( pagedResult.hasContent() ) {
+            return pagedResult.getContent();
+        }
+        else {
+            return new ArrayList<>();
+        }
     }
 }
 

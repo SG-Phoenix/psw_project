@@ -60,6 +60,15 @@ public class UserController {
         return new ResponseEntity(userService.getAllUsers().stream().map(user -> modelMapper.map(user, UserDto.class)), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/paged")
+    public ResponseEntity getAllUsers(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
+    ) {
+        return new ResponseEntity(userService.getAllUsers(page, pageSize, sortBy).stream().map(user -> modelMapper.map(user, UserDto.class)), HttpStatus.OK);
+    }
+
     @GetMapping(path = "by-id/{id}")
     public ResponseEntity getUserById(@PathVariable(name = "id") Long id) {
         try {
@@ -130,12 +139,30 @@ public class UserController {
     }
 
     @GetMapping(path = "{id}/addresses")
-    public ResponseEntity updateAddress(@PathVariable(name = "id")Long userId)
+    public ResponseEntity getAddresses(@PathVariable(name = "id")Long userId)
     {
         try
         {
             User user = userService.getUserById(userId);
             return new ResponseEntity(userService.getAllUserAddresses(user).stream().map(address -> modelMapper.map(address, AddressDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+        }catch (UserIdNotFoundException e)
+        {
+            return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND",e.getMessage(),e.getId()),HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    @GetMapping(path = "{id}/addresses/paged")
+    public ResponseEntity getAddressesPaged(@PathVariable(name = "id")Long userId,
+                                            @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                            @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
+                                            )
+    {
+        try
+        {
+            User user = userService.getUserById(userId);
+            return new ResponseEntity(userService.getAllUserAddresses(user, page, pageSize, sortBy).stream().map(address -> modelMapper.map(address, AddressDto.class)).collect(Collectors.toList()), HttpStatus.OK);
         }catch (UserIdNotFoundException e)
         {
             return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND",e.getMessage(),e.getId()),HttpStatus.BAD_REQUEST);

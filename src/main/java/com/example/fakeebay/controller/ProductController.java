@@ -53,6 +53,16 @@ public class ProductController {
         return new ResponseEntity(productService.getProductsByText(text).stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()), HttpStatus.OK);
     }
 
+    @GetMapping("/search/{text}/paged")
+    public ResponseEntity searchTextPaged(@PathVariable(name = "text") String text,
+                                          @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                          @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
+                                     )
+    {
+        return new ResponseEntity(productService.getProductsByText(text, page, pageSize, sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+    }
+
     @GetMapping("/advancedSearch")
     public ResponseEntity searchFiltered(@RequestParam(required = false, defaultValue = "") String name,
                                          @RequestParam(required = false, defaultValue = "") String barcode,
@@ -61,6 +71,21 @@ public class ProductController {
                                          @RequestParam(required = false) Float maxPrice)
     {
         return new ResponseEntity(productService.getFilteredProducts(name,barcode, qty,minPrice,maxPrice).stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+    }
+
+    @GetMapping("/advancedSearch/paged")
+    public ResponseEntity searchFilteredPaged(
+                                            @RequestParam(required = false, defaultValue = "") String name,
+                                             @RequestParam(required = false, defaultValue = "") String barcode,
+                                             @RequestParam(name = "quantity", required = false) Integer qty,
+                                             @RequestParam(required = false) Float minPrice,
+                                             @RequestParam(required = false) Float maxPrice,
+                                             @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                             @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
+                                              )
+    {
+        return new ResponseEntity(productService.getFilteredProducts(name,barcode, qty,minPrice,maxPrice, page, pageSize, sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @PutMapping()
@@ -97,11 +122,28 @@ public class ProductController {
         return new ResponseEntity(productService.getAllProducts().stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/paged")
+    public ResponseEntity getAllProductsPaged(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                              @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                              @RequestParam(name = "sortBy", defaultValue = "id") String sortBy)
+    {
+        return new ResponseEntity(productService.getAllProducts(page, pageSize, sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
+    }
+
     @GetMapping(path = "/available")
     public ResponseEntity getAllAvailableProducts()
     {
 
         return new ResponseEntity(productService.getAllAvailableProducts().stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/available/paged")
+    public ResponseEntity getAllAvailableProductsPaged(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                       @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                                       @RequestParam(name = "sortBy", defaultValue = "id") String sortBy)
+    {
+
+        return new ResponseEntity(productService.getAllAvailableProducts(page, pageSize, sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
     }
 
     @GetMapping(path = "/user/{id}")
@@ -111,6 +153,23 @@ public class ProductController {
         {
             User user = userService.getUserById(id);
             return new ResponseEntity(productService.getProductsByUser(user).stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
+        }catch(UserIdNotFoundException e)
+        {
+            return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(path = "/user/{id}/paged")
+    public ResponseEntity getUserProductsPaged(@PathVariable Long id,
+                                               @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                               @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                               @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
+                                               )
+    {
+        try
+        {
+            User user = userService.getUserById(id);
+            return new ResponseEntity(productService.getProductsByUser(user,page,pageSize,sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
         }catch(UserIdNotFoundException e)
         {
             return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
