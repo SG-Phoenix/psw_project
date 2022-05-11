@@ -15,7 +15,17 @@ spring:
       ddl-auto: update
 
 server:
-  port: 8080
+  port: 8081
+
+keycloak:
+  realm: SpringBootKeycloak
+  auth-server-url: http://localhost:8080/auth
+  resource: client-test
+  public-client: true
+  ssl-required: external
+  principal-attribute: preferred_username
+
+
 
 
 
