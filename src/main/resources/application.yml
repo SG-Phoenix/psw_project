@@ -13,18 +13,21 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/auth/realms/SpringBootKeycloak/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8080/auth/realms/SpringBootKeycloak
 
 server:
   port: 8081
 
+
 keycloak:
   realm: SpringBootKeycloak
-  auth-server-url: http://localhost:8080/auth
   resource: client-test
-  public-client: true
-  ssl-required: external
-  principal-attribute: preferred_username
-
+  auth-server-url: http://localhost:8080/auth
 
 
 

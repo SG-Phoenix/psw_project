@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(path = "orders")
 public class OrderController {
