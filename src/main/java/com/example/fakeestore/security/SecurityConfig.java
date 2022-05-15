@@ -40,27 +40,9 @@ class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 new SessionRegistryImpl());
     }
 
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true);
-        configuration.addAllowedOrigin("*");
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("OPTIONS");
-        configuration.addAllowedMethod("GET");
-        configuration.addAllowedMethod("POST");
-        configuration.addAllowedMethod("PUT");
-        source.registerCorsConfiguration("/**", configuration);
-        return new CorsFilter(source);
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                .antMatchers("/users/**").hasRole("user")
-                .antMatchers("/orders/**").hasRole("user")
-                .anyRequest().permitAll();
+
     }
 }

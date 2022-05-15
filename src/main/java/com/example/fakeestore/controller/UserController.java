@@ -23,6 +23,7 @@ import javax.validation.Valid;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(path = "users")
 public class UserController {
