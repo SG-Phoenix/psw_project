@@ -183,6 +183,8 @@ public class ProductController {
     {
         try{
             Product product = modelMapper.map(productDto, Product.class);
+            User user = userService.getUserById(productDto.getUserId());
+            product.setUser(user);
             return new ResponseEntity(modelMapper.map(productService.updateProduct(product), ProductDto.class), HttpStatus.OK);
         }catch(UserIdNotFoundException e)
         {
@@ -214,6 +216,17 @@ public class ProductController {
         try{
             productService.deleteProduct(id);
             return new ResponseEntity(new ResponseMessage("PRODUCT_DELETED"), HttpStatus.OK);
+        }catch (ProductNotFoundException e)
+        {
+            return new ResponseEntity(new ErrorMessage("ERROR_PRODUCT_NOT_FOUND", e.getMessage(),e.getId()),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity getProductById(@PathVariable Long id)
+    {
+        try{
+            return new ResponseEntity(modelMapper.map(productService.getProductById(id),ProductDto.class), HttpStatus.OK);
         }catch (ProductNotFoundException e)
         {
             return new ResponseEntity(new ErrorMessage("ERROR_PRODUCT_NOT_FOUND", e.getMessage(),e.getId()),HttpStatus.BAD_REQUEST);

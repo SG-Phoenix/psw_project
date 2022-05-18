@@ -70,8 +70,12 @@ public class UserService {
         {
             throw new UserAllreadyExistsException(user);
         }
+        User updatedUser = getUserById(user.getId());
+        updatedUser.setLastName(user.getLastName());
+        updatedUser.setFirstName(user.getFirstName());
+        updatedUser.setEMail(user.getEMail());
 
-        return userRepository.save(user);
+        return userRepository.save(updatedUser);
     }
 
     @Transactional(readOnly = true)
@@ -106,11 +110,19 @@ public class UserService {
     @Transactional
     public Address updateAddress(Address address) throws AddressNotFoundException
     {
-        if (!addressRepository.existsById(address.getId())) {
-            throw new AddressNotFoundException(address);
-        }
+        Address updatedAddress = getAddressById(address.getId());
+        updatedAddress.setCity(address.getCity());
+        updatedAddress.setCountry(address.getCountry());
+        updatedAddress.setStreet(address.getStreet());
+        updatedAddress.setPostalCode(address.getPostalCode());
+        return addressRepository.save(updatedAddress);
+    }
 
-        return addressRepository.save(address);
+    public Address getAddressById(Long id) throws AddressNotFoundException
+    {
+        return addressRepository.findById(id).orElseThrow(() -> {
+            throw new AddressNotFoundException(id);
+        });
     }
 
     @Transactional(readOnly = true)

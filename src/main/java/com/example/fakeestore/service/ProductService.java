@@ -145,6 +145,7 @@ public class ProductService {
         Product productToUpdate = productRepository.findById(product.getId()).orElseThrow(() -> {throw new ProductNotFoundException(product.getId());});
         productToUpdate.setName(product.getName());
         productToUpdate.setBarcode(product.getBarcode());
+        productToUpdate.setDescription(product.getDescription());
         productToUpdate.setPrice(product.getPrice());
         productToUpdate.setQuantity(product.getQuantity());
         return productRepository.save(productToUpdate);
