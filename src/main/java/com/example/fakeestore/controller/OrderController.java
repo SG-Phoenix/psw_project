@@ -99,38 +99,6 @@ public class OrderController {
 
     }
 
-    /**
-     * Retrieves all orders made by user that match the date filters
-     *
-     * @param id                        Used to retrieve user
-     * @param fromDate                  Used to filter results
-     *                                  retrieve only orders whos creation date is > fromDate
-     *
-    * @param toDate                     Used to filter results
-     *                                  retrieve only orders whos creation date is < toDate
-     *
-     * @return                          List of orders
-     *
-     *
-     * @throws UserIdNotFoundException  if user was not found by given id
-     *
-     * @see OrderDto
-     */
-
-    @GetMapping(path = "user/{id}")
-    public ResponseEntity getOrdersByUser(@PathVariable Long id,
-                                          @RequestParam(value = "fromDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
-                                          @RequestParam(value = "toDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate)
-    {
-        try
-        {
-            User user = userService.getUserById(id);
-            return new ResponseEntity(orderService.getAllUserOrders(user, fromDate, toDate), HttpStatus.OK);
-        }catch(UserIdNotFoundException e)
-        {
-            return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
-        }
-    }
 
     /**
      * Same use of getOrdersByUser but paged
@@ -144,7 +112,6 @@ public class OrderController {
      * @throws UserIdNotFoundException  if user was not found by given id
      *
      * @see OrderDto
-     * @see OrderController#getOrdersByUser(Long, Date, Date)
      */
 
     @GetMapping(path = "user/{id}/paged")
@@ -164,44 +131,6 @@ public class OrderController {
         {
             return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
         }
-    }
-
-    /**
-     * Simple method that retrieve all orders
-     *
-     * @return List of orders
-     *
-     * @see OrderDto
-     */
-    @GetMapping
-    public ResponseEntity getAllOrders()
-    {
-        return new ResponseEntity(orderService.getAllOrders().stream().map(order -> modelMapper.map(order, OrderDto.class)),HttpStatus.OK);
-    }
-
-
-    /**
-     *  Same as getAllOrders but pages the results
-     *
-     * @param page          used to select desired page
-     * @param pageSize      used to set single page dimension
-     * @param sortBy        used to change sorting
-     *
-     *
-     * @return              List of orders
-     *
-     * @see OrderController#getAllOrders()
-     * @see OrderDto
-     *
-     */
-    @GetMapping(path = "/paged")
-    public ResponseEntity getAllOrdersPaged(
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
-    )
-    {
-        return new ResponseEntity(orderService.getAllOrders(page, pageSize, sortBy).stream().map(order -> modelMapper.map(order, OrderDto.class)),HttpStatus.OK);
     }
 
 
@@ -229,96 +158,6 @@ public class OrderController {
 
     }
 
-    /**
-     * Retrieves all purchases of a particular product
-     *
-     *
-     * @param id                        Product id
-     *
-     * @return                          List of PurchaseDto objects
-     *
-     * @throws ProductNotFoundException if there is no product with given id
-     *
-     * @see PurchaseDto
-     */
-
-    @GetMapping(path = "/purchases/by-product/{id}")
-    public ResponseEntity getProductPurchases(@PathVariable Long id)
-    {
-        try
-        {
-            Product product = productService.getProductById(id);
-
-            return new ResponseEntity(orderService.getPurchasesByProduct(product).stream().map(order -> modelMapper.map(order, PurchaseDto.class)).collect(Collectors.toList()),HttpStatus.OK);
-
-        }catch(ProductNotFoundException e)
-        {
-            return new ResponseEntity(new ErrorMessage("ERROR_PRODUCT_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
-        }
-
-    }
-
-    /**
-     * Same as getProductPurchases
-     *
-     * @param page                      used to select desired page
-     * @param pageSize                  used to set single page dimension
-     * @param sortBy                    used to change sorting
-     *
-     * @return                          List of PurchaseDto objects
-     *
-     * @throws ProductNotFoundException if there is no product with given id
-     *
-     * @see PurchaseDto
-     * @see OrderController#getProductPurchases(Long)
-     */
-    @GetMapping(path = "/purchases/by-product/{id}/paged")
-    public ResponseEntity getProductPurchasesPaged(@PathVariable Long id,
-                                                   @RequestParam(name = "page", defaultValue = "0") Integer page,
-                                                   @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                                                   @RequestParam(name = "sortBy", defaultValue = "id") String sortBy)
-    {
-        try
-        {
-            Product product = productService.getProductById(id);
-
-            return new ResponseEntity(orderService.getPurchasesByProduct(product, page, pageSize, sortBy).stream().map(order -> modelMapper.map(order, PurchaseDto.class)).collect(Collectors.toList()),HttpStatus.OK);
-
-        }catch(ProductNotFoundException e)
-        {
-            return new ResponseEntity(new ErrorMessage("ERROR_PRODUCT_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
-        }
-
-    }
-
-    /**
-     * Retrieves all purchases of products published by user
-     *
-     *
-     * @param id                        User id
-     *
-     * @return                          List of PurchaseDto objects
-     *
-     * @throws UserIdNotFoundException if there is no user with given id
-     *
-     * @see PurchaseDto
-     *
-     */
-
-    @GetMapping(path = "/purchases/by-user/{id}")
-    public ResponseEntity getUserPurchases(@PathVariable Long id)
-    {
-        try
-        {
-            User user = userService.getUserById(id);
-            return new ResponseEntity(orderService.getPurchasesByUser(user).stream().map(order -> modelMapper.map(order, PurchaseDto.class)).collect(Collectors.toList()), HttpStatus.OK);
-
-        }catch(UserIdNotFoundException e)
-        {
-            return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
-        }
-
-    }
 
     /**
      * Same as getUserPurchases
@@ -332,7 +171,6 @@ public class OrderController {
      * @throws UserIdNotFoundException  if there is no user with given id
      *
      * @see PurchaseDto
-     * @see OrderController#getUserPurchases(Long)
      */
 
     @GetMapping(path = "/purchases/by-user/{id}/paged")

@@ -83,22 +83,6 @@ public class UserService {
         return userRepository.save(updatedUser);
     }
 
-    @Transactional(readOnly = true)
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public List<User> getAllUsers(int page, int pageSize, String sortBy) {
-        Pageable pageable = PageRequest.of(page,pageSize, Sort.by(sortBy));
-        Page<User> pagedResult = userRepository.findAll(pageable);
-        if ( pagedResult.hasContent() ) {
-            return pagedResult.getContent();
-        }
-        else {
-            return new ArrayList<>();
-        }
-    }
 
     @Transactional
     public void deleteUser(User user) {

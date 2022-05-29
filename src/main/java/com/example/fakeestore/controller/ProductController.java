@@ -70,24 +70,9 @@ public class ProductController {
 
     }
 
-    /**
-     * Simple filter used to retrieve product by using simple string
-     *
-     * @param text      used to find products that contains given
-     *                  string either in name or barcode
-     *
-     * @return          List of filtered products
-     * @see ProductDto
-     *
-     */
-    @GetMapping("/search/{text}")
-    public ResponseEntity searchText(@PathVariable(name = "text") String text)
-    {
-        return new ResponseEntity(productService.getProductsByText(text).stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()), HttpStatus.OK);
-    }
 
     /**
-     * Same as searchText but paged
+     * Same as searchFiltered paged
      *
      * @param page          used to select desired page
      * @param pageSize      used to set single page dimension
@@ -95,66 +80,6 @@ public class ProductController {
      *
      * @return              List of filtered products
      *
-     * @see ProductController#searchText(String)
-     * @see ProductDto
-     *
-     */
-
-    @GetMapping("/search/{text}/paged")
-    public ResponseEntity searchTextPaged(@PathVariable(name = "text") String text,
-                                          @RequestParam(name = "page", defaultValue = "0") Integer page,
-                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                                          @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
-                                     )
-    {
-        return new ResponseEntity(productService.getProductsByText(text, page, pageSize, sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()), HttpStatus.OK);
-    }
-
-    /**
-     * Advanced filter used to retrieve product by using multiple parameters
-     *
-     * @param name      used to find products that contains given name
-     * @param barcode   used to find products that contains given barcode
-     * @param qty       used to find products that have AT LEAST given quantity
-     * @param minPrice  used to find products by price
-     *                  retrives only those who have price > minPrice
-     * @param maxPrice  used to find products by price
-     *                  retrives only those who have price < maxPrice
-     *
-     * @return          List of filtered products
-     *
-     * @see ProductDto
-     *
-     */
-
-    @GetMapping("/advancedSearch")
-    public ResponseEntity searchFiltered(@RequestParam(required = false, defaultValue = "") String name,
-                                         @RequestParam(required = false, defaultValue = "") String barcode,
-                                         @RequestParam(name = "quantity", required = false) Integer qty,
-                                         @RequestParam(required = false) Float minPrice,
-                                         @RequestParam(required = false) Float maxPrice,
-                                         @RequestParam(required = false, defaultValue = "") String category)
-    {
-        String[] categoryList;
-        if(!category.equals(""))
-            categoryList  = category.split(",");
-        else
-            categoryList = new String[] {"*"} ;
-        return new ResponseEntity(productService.getFilteredProducts(name,barcode, qty,minPrice,maxPrice,categoryList)
-                .stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()
-                ), HttpStatus.OK);
-    }
-
-    /**
-     * Same as searchFiltered but paged
-     *
-     * @param page          used to select desired page
-     * @param pageSize      used to set single page dimension
-     * @param sortBy        used to change sorting
-     *
-     * @return              List of filtered products
-     *
-     * @see ProductController#searchFiltered(String, String, Integer, Float, Float, String)
      * @see ProductDto
      *
      */
@@ -257,105 +182,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Simple method that retrieve all products
-     *
-     * @return List of products
-     *
-     * @see ProductDto
-     *
-     */
-
-    @GetMapping
-    public ResponseEntity getAllProducts()
-    {
-        return new ResponseEntity(productService.getAllProducts().stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
-    }
-
-    /**
-     * Same as getAllProducts but paged
-     *
-     * @param page                      used to select desired page
-     * @param pageSize                  used to set single page dimension
-     * @param sortBy                    used to change sorting
-     *
-     * @return List of products
-     *
-     * @see ProductDto
-     *
-     */
-
-    @GetMapping(path = "/paged")
-    public ResponseEntity getAllProductsPaged(@RequestParam(name = "page", defaultValue = "0") Integer page,
-                                              @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                                              @RequestParam(name = "sortBy", defaultValue = "id") String sortBy)
-    {
-        return new ResponseEntity(productService.getAllProducts(page, pageSize, sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
-    }
-
-    /**
-     * Retrieves products that are available( qty > 0 )
-     *
-     * @return List of products
-     *
-     * @see ProductDto
-     *
-     */
-
-    @GetMapping(path = "/available")
-    public ResponseEntity getAllAvailableProducts()
-    {
-
-        return new ResponseEntity(productService.getAllAvailableProducts().stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
-    }
-
-    /**
-     * Same as getAllAvailableProducts but paged
-     *
-     * @param page                      used to select desired page
-     * @param pageSize                  used to set single page dimension
-     * @param sortBy                    used to change sorting
-     *
-     * @return List of products
-     *
-     * @see ProductDto
-     *
-     */
-
-    @GetMapping(path = "/available/paged")
-    public ResponseEntity getAllAvailableProductsPaged(@RequestParam(name = "page", defaultValue = "0") Integer page,
-                                                       @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                                                       @RequestParam(name = "sortBy", defaultValue = "id") String sortBy)
-    {
-
-        return new ResponseEntity(productService.getAllAvailableProducts(page, pageSize, sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
-    }
-
-    /**
-     * Retrieve product published by user
-     *
-     * @param id                        user id
-     *
-     * @return                          List of products
-     *
-     * @throws UserIdNotFoundException if user was not found by given id
-     *
-     * @see ProductDto
-     *
-     */
-
-    @GetMapping(path = "/user/{id}")
-    public ResponseEntity getUserProducts(@PathVariable Long id)
-    {
-        try
-        {
-            User user = userService.getUserById(id);
-            return new ResponseEntity(productService.getProductsByUser(user).stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
-        }catch(UserIdNotFoundException e)
-        {
-            return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
-        }
-    }
 
     /**
      * Same as getUserProducts but paged

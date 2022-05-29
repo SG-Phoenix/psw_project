@@ -68,31 +68,7 @@ public class OrderService {
         return newOrder;
     }
 
-    @Transactional(readOnly = true)
-    public List<Order> getAllOrders()
-    {
-        return orderRepository.findAll();
-    }
 
-    @Transactional(readOnly = true)
-    public List<Order> getAllOrders(int page, int pageSize, String sortBy)
-    {
-        Pageable pageable = PageRequest.of(page,pageSize, Sort.by(sortBy));
-        Page<Order> pagedResult = orderRepository.findAll(pageable);
-        if ( pagedResult.hasContent() ) {
-            return pagedResult.getContent();
-        }
-        else {
-            return new ArrayList<>();
-        }
-    }
-
-
-    @Transactional(readOnly = true)
-    public List<Order> getAllUserOrders(User user, Date fromDate, Date toDate)
-    {
-        return orderRepository.findByUser(user, fromDate, toDate);
-    }
 
     @Transactional(readOnly = true)
     public Page<Order> getAllUserOrders(User user, Date fromDate, Date toDate, int page, int pageSize, String sortBy)
@@ -112,31 +88,6 @@ public class OrderService {
     }
 
 
-
-    @Transactional(readOnly = true)
-    public List<OrderLine> getPurchasesByProduct(Product product)
-    {
-        return orderLineRepository.findPurchasesByProduct(product);
-    }
-
-    @Transactional(readOnly = true)
-    public List<OrderLine> getPurchasesByProduct(Product product, int page, int pageSize, String sortBy)
-    {
-        Pageable pageable = PageRequest.of(page,pageSize, Sort.by(sortBy));
-        Page<OrderLine> pagedResult = orderLineRepository.findPurchasesByProduct(product, pageable);
-        if ( pagedResult.hasContent() ) {
-            return pagedResult.getContent();
-        }
-        else {
-            return new ArrayList<>();
-        }
-    }
-
-    @Transactional(readOnly = true)
-    public List<OrderLine> getPurchasesByUser(User user)
-    {
-        return orderLineRepository.findPurchasesByUser(user);
-    }
 
     @Transactional(readOnly = true)
     public Page<OrderLine> getPurchasesByUser(User user, int page, int pageSize, String sortBy)

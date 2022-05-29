@@ -1,4 +1,11 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/auth/realms/fakeestore/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8080/auth/realms/fakeestore
+
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
@@ -16,7 +23,8 @@ spring:
 server:
   port: 8081
 
-
+keycloak:
+  resource: fakeestore
 
 
 

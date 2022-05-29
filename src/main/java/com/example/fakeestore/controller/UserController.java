@@ -93,41 +93,6 @@ public class UserController {
     }
 
 
-    /**
-     * Simple method that retrieve all users
-     *
-     * @return List of users
-     *
-     * @see UserDto
-     *
-     */
-
-    @GetMapping
-    public ResponseEntity getAllUsers() {
-        return new ResponseEntity(userService.getAllUsers().stream().map(user -> modelMapper.map(user, UserDto.class)), HttpStatus.OK);
-    }
-
-    /**
-     * Same use of getAllUsers but paged
-     *
-     * @param page                      used to select desired page
-     * @param pageSize                  used to set single page dimension
-     * @param sortBy                    used to change sorting
-     *
-     * @return                          List of users
-     *
-     * @see UserDto
-     *
-     */
-
-    @GetMapping(path = "/paged")
-    public ResponseEntity getAllUsers(
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
-    ) {
-        return new ResponseEntity(userService.getAllUsers(page, pageSize, sortBy).stream().map(user -> modelMapper.map(user, UserDto.class)), HttpStatus.OK);
-    }
 
     /**
      * Simple method that retrieve particular user by id
