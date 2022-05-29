@@ -24,7 +24,13 @@ public class ProductDto {
     @NotNull
     private int quantity;
     @NotNull
-    @JsonProperty(value = "userId")
-    private Long userId;
+    @JsonProperty(value = "user")
+    private String userUsername;
+
+    @JsonProperty(value = "category")
+    private String categoryName;
+
+    @JsonProperty(value = "brand")
+    private String marca;
 
 }

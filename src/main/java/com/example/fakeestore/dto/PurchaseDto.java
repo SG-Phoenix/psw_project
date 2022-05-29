@@ -1,9 +1,12 @@
 package com.example.fakeestore.dto;
 
+import com.example.fakeestore.entity.Product;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -12,8 +15,8 @@ public class PurchaseDto {
 
     private Long id;
     private Integer quantity;
-    @JsonProperty(value = "productId")
-    private Long productId;
+    @JsonProperty(value = "product")
+    private Product product;
     @JsonProperty(value = "orderId")
     private Long orderId;
     private Float purchasePrice;
@@ -21,5 +24,6 @@ public class PurchaseDto {
     private String city;
     private String postalCode;
     private String street;
+    private Date orderDate;
 
 }

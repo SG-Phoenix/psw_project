@@ -2,17 +2,17 @@ package com.example.fakeestore.controller;
 
 import com.example.fakeestore.dto.OrderDto;
 import com.example.fakeestore.dto.ProductDto;
+import com.example.fakeestore.entity.Category;
 import com.example.fakeestore.entity.Product;
 import com.example.fakeestore.entity.User;
-import com.example.fakeestore.exceptions.ProductNotEnoughtQuantity;
-import com.example.fakeestore.exceptions.ProductNotFoundException;
-import com.example.fakeestore.exceptions.UserIdNotFoundException;
+import com.example.fakeestore.exceptions.*;
 import com.example.fakeestore.messages.ErrorMessage;
 import com.example.fakeestore.messages.ResponseMessage;
 import com.example.fakeestore.service.ProductService;
 import com.example.fakeestore.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,13 +55,17 @@ public class ProductController {
     {
         try
         {
-            User user = userService.getUserById(productDto.getUserId());
+            User user = userService.getUserByUsername(productDto.getUserUsername());
+            Category category = productService.getCategory(productDto.getCategoryName());
             Product product = modelMapper.map(productDto,  Product.class);
             product.setUser(user);
+            product.setCategory(category);
             return new ResponseEntity(modelMapper.map(productService.createProduct(product), ProductDto.class), HttpStatus.CREATED);
-        }catch(UserIdNotFoundException e)
-        {
-            return new ResponseEntity(new ErrorMessage("USER_NOT_FOUND_EXCEPTION",e.getMessage(),e.getId()), HttpStatus.BAD_REQUEST);
+        }
+        catch (UserNameNotFoundException e) {
+            return new ResponseEntity(new ErrorMessage("USER_NOT_FOUND_EXCEPTION",e.getMessage(),e.getUserName()), HttpStatus.BAD_REQUEST);
+        } catch (CategoryNotFoundException e) {
+            return new ResponseEntity(new ErrorMessage("CATEGORY_NOT_FOUND_EXCEPTION",e.getMessage(),e.getCategory()), HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -128,9 +132,17 @@ public class ProductController {
                                          @RequestParam(required = false, defaultValue = "") String barcode,
                                          @RequestParam(name = "quantity", required = false) Integer qty,
                                          @RequestParam(required = false) Float minPrice,
-                                         @RequestParam(required = false) Float maxPrice)
+                                         @RequestParam(required = false) Float maxPrice,
+                                         @RequestParam(required = false, defaultValue = "") String category)
     {
-        return new ResponseEntity(productService.getFilteredProducts(name,barcode, qty,minPrice,maxPrice).stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+        String[] categoryList;
+        if(!category.equals(""))
+            categoryList  = category.split(",");
+        else
+            categoryList = new String[] {"*"} ;
+        return new ResponseEntity(productService.getFilteredProducts(name,barcode, qty,minPrice,maxPrice,categoryList)
+                .stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()
+                ), HttpStatus.OK);
     }
 
     /**
@@ -142,7 +154,7 @@ public class ProductController {
      *
      * @return              List of filtered products
      *
-     * @see ProductController#searchFiltered(String, String, Integer, Float, Float)
+     * @see ProductController#searchFiltered(String, String, Integer, Float, Float, String)
      * @see ProductDto
      *
      */
@@ -154,12 +166,19 @@ public class ProductController {
                                              @RequestParam(name = "quantity", required = false) Integer qty,
                                              @RequestParam(required = false) Float minPrice,
                                              @RequestParam(required = false) Float maxPrice,
+                                             @RequestParam(required = false, defaultValue = "") String category,
                                              @RequestParam(name = "page", defaultValue = "0") Integer page,
                                              @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                              @RequestParam(name = "sortBy", defaultValue = "id") String sortBy
                                               )
     {
-        return new ResponseEntity(productService.getFilteredProducts(name,barcode, qty,minPrice,maxPrice, page, pageSize, sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+        String[] categoryList;
+        if(!category.equals(""))
+            categoryList  = category.split(",");
+        else
+            categoryList = new String[] {"*"} ;
+        return new ResponseEntity(mapEntityPageIntoDtoPage( productService.getFilteredProducts(name,barcode, qty,minPrice,maxPrice,categoryList, page, pageSize, sortBy), ProductDto.class)
+                , HttpStatus.OK);
     }
 
     /**
@@ -183,16 +202,21 @@ public class ProductController {
     {
         try{
             Product product = modelMapper.map(productDto, Product.class);
-            User user = userService.getUserById(productDto.getUserId());
+            User user = userService.getUserByUsername(productDto.getUserUsername());
+            Category category = productService.getCategory(productDto.getCategoryName());
             product.setUser(user);
+            product.setCategory(category);
             return new ResponseEntity(modelMapper.map(productService.updateProduct(product), ProductDto.class), HttpStatus.OK);
-        }catch(UserIdNotFoundException e)
-        {
-            return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND",e.getMessage(),e.getId()),HttpStatus.OK);
         }
         catch (ProductNotFoundException e)
         {
             return new ResponseEntity(new ErrorMessage("ERROR_PRODUCT_NOT_FOUND",e.getMessage(),e.getId()),HttpStatus.OK);
+        }
+        catch (CategoryNotFoundException e)
+        {
+            return new ResponseEntity(new ErrorMessage("ERROR_CATEGORY_NOT_FOUND",e.getMessage(),e.getCategory()),HttpStatus.OK);
+        } catch (UserNameNotFoundException e) {
+            return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND",e.getMessage(),e.getUserName()),HttpStatus.OK);
         }
     }
 
@@ -358,11 +382,22 @@ public class ProductController {
         try
         {
             User user = userService.getUserById(id);
-            return new ResponseEntity(productService.getProductsByUser(user,page,pageSize,sortBy).stream().map(product -> modelMapper.map(product,ProductDto.class)), HttpStatus.OK);
+            return new ResponseEntity(mapEntityPageIntoDtoPage(productService.getProductsByUser(user,page,pageSize,sortBy), ProductDto.class), HttpStatus.OK);
         }catch(UserIdNotFoundException e)
         {
             return new ResponseEntity(new ErrorMessage("ERROR_USER_NOT_FOUND", e.getMessage(), e.getId()), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(path = "/categories")
+    public ResponseEntity getCategories()
+    {
+        return new ResponseEntity(productService.getCategories(), HttpStatus.OK);
+    }
+
+
+    private <Dto, Entity> Page<Dto> mapEntityPageIntoDtoPage(Page<Entity> entities, Class<Dto> dtoClass) {
+        return entities.map(objectEntity -> modelMapper.map(objectEntity, dtoClass));
     }
 
 

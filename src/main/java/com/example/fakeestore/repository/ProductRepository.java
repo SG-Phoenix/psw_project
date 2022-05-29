@@ -32,6 +32,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "FROM Product p " +
             "WHERE (p.name LIKE %:name%) AND" +
             "(p.barcode LIKE %:barcode%) AND" +
+            "(p.category.name in :category OR '*' in :category) AND" +
             "(p.quantity > :qty OR :qty IS NULL) AND" +
             "(p.price >= :minPrice OR :minPrice IS NULL) AND" +
             "(p.price < :maxPrice OR :maxPrice IS NULL)")
@@ -39,12 +40,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                  @Param(value = "barcode") String barcode,
                                  @Param(value = "qty") Integer qty,
                                  @Param(value = "minPrice") Float minPrice,
-                                 @Param(value = "maxPrice") Float maxPrice);
+                                 @Param(value = "maxPrice") Float maxPrice,
+                                 @Param(value = "category") String category[]
+                                 );
 
     @Query("SELECT p " +
             "FROM Product p " +
             "WHERE (p.name LIKE %:name%) AND" +
             "(p.barcode LIKE %:barcode%) AND" +
+            "(p.category.name in :category OR '*' in :category) AND" +
             "(p.quantity > :qty OR :qty IS NULL) AND" +
             "(p.price >= :minPrice OR :minPrice IS NULL) AND" +
             "(p.price < :maxPrice OR :maxPrice IS NULL)")
@@ -52,6 +56,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                  @Param(value = "barcode") String barcode,
                                  @Param(value = "qty") Integer qty,
                                  @Param(value = "minPrice") Float minPrice,
-                                 @Param(value = "maxPrice") Float maxPrice, Pageable pageable);
+                                 @Param(value = "maxPrice") Float maxPrice,
+                                 @Param(value = "category") String category[],
+                                 Pageable pageable);
 
 }

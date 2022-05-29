@@ -28,14 +28,14 @@ public class Order
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     @JsonProperty(value = "products")
     private List<OrderLine> productsList;
 
-    @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "purchase_time")
-    private Date createDate;
+    @JsonProperty(value = "purchaseTime")
+    private Date creationDate;
 
     @Column(nullable = false)
     private String country;
@@ -45,4 +45,6 @@ public class Order
     private String postalCode;
     @Column(nullable = false)
     private String street;
+
+    private Double totalPrice;
 };

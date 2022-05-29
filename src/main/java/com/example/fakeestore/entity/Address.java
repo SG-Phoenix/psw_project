@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -35,6 +36,8 @@ public class Address {
     private String postalCode;
     @Column(nullable = false)
     private String country;
+    @Column(nullable = false)
+    private String title;
 
     @Basic
     @Version

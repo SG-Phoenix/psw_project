@@ -22,5 +22,7 @@ public class AddressDto {
     private String postalCode;
     @NotNull
     private String street;
+    @NotNull
+    private String title;
 
 }

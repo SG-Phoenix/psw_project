@@ -315,5 +315,49 @@ public class UserController {
 
     }
 
+    /**
+     *
+     *
+     * @return                          Address
+     *
+     * @see AddressDto
+     *
+     */
+
+    @GetMapping(path = "addresses/{id}")
+    public ResponseEntity getAddress(@PathVariable(name = "id")Long addressId)
+    {
+        try
+        {
+            return new ResponseEntity(modelMapper.map(userService.getAddressById(addressId),AddressDto.class), HttpStatus.OK);
+        } catch (AddressNotFoundException e) {
+            return new ResponseEntity(new ErrorMessage("ERROR_ADDRESS_NOT_FOUND",e.getMessage(),e.getAddress()),HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    /**
+     * Deletes user address
+     *
+     *
+     * @return                          message
+     *
+     *
+     */
+
+    @DeleteMapping(path = "addresses/{id}")
+    public ResponseEntity deleteAddress(@PathVariable(name = "id")Long addressId)
+    {
+        try
+        {
+            Address address = userService.getAddressById(addressId);
+            userService.deleteAddress(address);
+            return new ResponseEntity(new ResponseMessage("Address deleted"), HttpStatus.OK);
+        } catch (AddressNotFoundException e) {
+            return new ResponseEntity(new ErrorMessage("ERROR_ADDRESS_NOT_FOUND",e.getMessage(),e.getAddress()),HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
 
 }

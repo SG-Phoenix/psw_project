@@ -46,17 +46,22 @@ public class UserService {
     @Transactional(readOnly = true)
     public User getUserById(Long id) throws UserIdNotFoundException
     {
-        return userRepository.findUserById(id).orElseThrow(() -> {
+        Optional<User> user = userRepository.findUserById(id);
+
+        if(!user.isPresent())
             throw new UserIdNotFoundException(id);
-        });
+
+        return user.get();
     }
 
     @Transactional(readOnly = true)
-    public User getUserByUsername(String username) throws UserIdNotFoundException
+    public User getUserByUsername(String username) throws UserNameNotFoundException
     {
-        return userRepository.findUserByUsername(username).orElseThrow(() -> {
+        Optional<User> user = userRepository.findUserByUsername(username);
+
+        if(!user.isPresent())
             throw new UserNameNotFoundException(username);
-        });
+        return user.get();
     }
 
     @Transactional
@@ -143,6 +148,11 @@ public class UserService {
         else {
             return new ArrayList<>();
         }
+    }
+
+    public void deleteAddress(Address address) {
+
+        addressRepository.delete(address);
     }
 }
 

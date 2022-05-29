@@ -16,13 +16,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT o " +
             "FROM Order o " +
-            "WHERE o.user=:user AND (o.createDate >= :fromDate OR :fromDate IS NULL) AND (o.createDate <= :toDate OR :toDate IS NULL)" +
+            "WHERE o.user=:user AND (o.creationDate >= :fromDate OR :fromDate IS NULL) AND (o.creationDate <= :toDate OR :toDate IS NULL)" +
             "ORDER BY o.id DESC ")
     List<Order> findByUser(User user, Date fromDate, Date toDate);
 
     @Query("SELECT o " +
           "FROM Order o " +
-          "WHERE o.user=:user AND (o.createDate >= :fromDate OR :fromDate IS NULL) AND (o.createDate <= :toDate OR :toDate IS NULL)" +
+          "WHERE o.user=:user AND (o.creationDate >= :fromDate OR :fromDate IS NULL) AND (o.creationDate <= :toDate OR :toDate IS NULL)" +
           "ORDER BY o.id DESC ")
     Page<Order> findByUser(User user, Date fromDate, Date toDate, Pageable pageable);
 

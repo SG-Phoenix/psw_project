@@ -7,16 +7,14 @@ import com.example.fakeestore.entity.Order;
 import com.example.fakeestore.entity.OrderLine;
 import com.example.fakeestore.entity.Product;
 import com.example.fakeestore.entity.User;
-import com.example.fakeestore.exceptions.OrderNotFoundException;
-import com.example.fakeestore.exceptions.ProductNotEnoughtQuantity;
-import com.example.fakeestore.exceptions.ProductNotFoundException;
-import com.example.fakeestore.exceptions.UserIdNotFoundException;
+import com.example.fakeestore.exceptions.*;
 import com.example.fakeestore.messages.ErrorMessage;
 import com.example.fakeestore.service.OrderService;
 import com.example.fakeestore.service.ProductService;
 import com.example.fakeestore.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -75,7 +73,7 @@ public class OrderController {
                 Product product = productService.getProductById(old.getProductId());
                 ol.setProduct(product);
                 ol.setOrder(order);
-                ol.setPurchasePrice(product.getPrice());
+                ol.setPurchasePrice(old.getPurchasePrice());
 
                 orderLineList.add(ol);
 
@@ -95,6 +93,8 @@ public class OrderController {
         catch (ProductNotEnoughtQuantity e)
         {
             return new ResponseEntity(new ErrorMessage("ERROR_PRODUCT_NOT_ENOUGHT", e.getMessage(), e.getProduct()), HttpStatus.BAD_REQUEST);
+        } catch (ProductChangedPrice e) {
+            return new ResponseEntity(new ErrorMessage("ERROR_PRODUCT_CHANGED_PRICE", e.getMessage(), e.getProduct()), HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -344,7 +344,7 @@ public class OrderController {
         try
         {
             User user = userService.getUserById(id);
-            return new ResponseEntity(orderService.getPurchasesByUser(user,page, pageSize, sortBy).stream().map(order -> modelMapper.map(order, PurchaseDto.class)).collect(Collectors.toList()), HttpStatus.OK);
+            return new ResponseEntity(mapEntityPageIntoDtoPage(orderService.getPurchasesByUser(user,page, pageSize, sortBy), PurchaseDto.class), HttpStatus.OK);
 
         }catch(UserIdNotFoundException e)
         {
@@ -353,6 +353,9 @@ public class OrderController {
 
     }
 
+    private <PurchaseDto, OrderLine> Page<PurchaseDto> mapEntityPageIntoDtoPage(Page<OrderLine> entities, Class<PurchaseDto> dtoClass) {
+        return entities.map(objectEntity -> modelMapper.map(objectEntity, dtoClass));
+    }
 
 
 

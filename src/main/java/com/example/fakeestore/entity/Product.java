@@ -3,8 +3,10 @@ package com.example.fakeestore.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -56,9 +58,22 @@ public class Product {
     @JsonIgnore
     private User user;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.MERGE)
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "creation_time")
+    private Date creationDate;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
     @JsonIgnore
     @ToString.Exclude
     private List<OrderLine> orderLines;
+
+    @ManyToOne(optional = false)
+    private Category category;
+
+    private String marca;
+
+
+
 
 }

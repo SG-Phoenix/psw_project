@@ -30,6 +30,7 @@ public class FakeEBayApplication {
                 map().setCountry(source.getOrder().getCountry());
                 map().setCity(source.getOrder().getCity());
                 map().setPostalCode(source.getOrder().getPostalCode());
+                map().setOrderDate(source.getOrder().getCreationDate());
             }
         };
         modelMapper.addMappings(purchaseDtoPropertyMap);

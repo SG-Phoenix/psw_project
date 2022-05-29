@@ -1,6 +1,6 @@
 package com.example.fakeestore.exceptions;
 
-public class UserIdNotFoundException extends RuntimeException{
+public class UserIdNotFoundException extends Throwable{
 
     private Long id;
     public UserIdNotFoundException(Long id)

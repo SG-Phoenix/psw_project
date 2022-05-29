@@ -1,6 +1,6 @@
 package com.example.fakeestore.exceptions;
 
-public class ProductNotFoundException extends RuntimeException {
+public class ProductNotFoundException extends Throwable {
     private Long id;
     public ProductNotFoundException(Long id) {
         super("Product with id " + id + " not found");

@@ -2,7 +2,7 @@ package com.example.fakeestore.exceptions;
 
 import com.example.fakeestore.entity.Product;
 
-public class ProductNotEnoughtQuantity extends RuntimeException {
+public class ProductNotEnoughtQuantity extends Throwable {
     private Product product;
     private int quantity;
     public ProductNotEnoughtQuantity(Product product, int quantity) {

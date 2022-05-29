@@ -27,11 +27,11 @@ public class OrderLine
     @Column(name = "purchase_price")
     private Float purchasePrice;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "product_id", updatable = false)
     private Product product;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "order_id", updatable = false)
     @JsonIgnore
     private Order order;

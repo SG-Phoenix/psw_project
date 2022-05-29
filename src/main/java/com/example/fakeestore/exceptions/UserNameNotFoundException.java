@@ -1,6 +1,6 @@
 package com.example.fakeestore.exceptions;
 
-public class UserNameNotFoundException extends RuntimeException {
+public class UserNameNotFoundException extends Throwable {
 
     private String userName;
     public UserNameNotFoundException(String userName) {
