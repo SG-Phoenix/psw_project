@@ -106,6 +106,20 @@ public class ProductController {
                 , HttpStatus.OK);
     }
 
+    @GetMapping("/new")
+    public ResponseEntity getNewProducts()
+    {
+        return new ResponseEntity(mapEntityPageIntoDtoPage( productService.getNewProducts(), ProductDto.class)
+                , HttpStatus.OK);
+    }
+
+    @GetMapping("/random")
+    public ResponseEntity getRecentlyPurchased()
+    {
+        return new ResponseEntity(mapEntityPageIntoDtoPage( productService.getRandomProducts(), ProductDto.class)
+                , HttpStatus.OK);
+    }
+
     /**
      *
      * Updates product

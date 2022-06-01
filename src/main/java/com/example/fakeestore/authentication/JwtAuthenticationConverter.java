@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 
 
 public class JwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
-    @Value("${keycloak.resource}")
-    private String CLIENT_NAME;
+    private String CLIENT_NAME = "fakeestore-backend";
 
 
     @Override

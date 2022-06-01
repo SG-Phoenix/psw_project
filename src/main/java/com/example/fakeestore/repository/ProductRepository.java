@@ -60,4 +60,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                  @Param(value = "category") String category[],
                                  Pageable pageable);
 
+    Page<Product> findByOrderByIdDesc(Pageable pageable);
+    @Query("SELECT p " +
+            "FROM Product p " +
+            "WHERE (p.id in :idList)")
+    Page<Product> getRandomProducts(@Param(value = "idList")Long[] randId, Pageable pageable);
+
 }

@@ -5,6 +5,7 @@ import com.example.fakeestore.dto.OrderDto;
 import com.example.fakeestore.dto.ProductDto;
 import com.example.fakeestore.dto.UserDto;
 import com.example.fakeestore.entity.Address;
+import com.example.fakeestore.entity.Order;
 import com.example.fakeestore.entity.User;
 import com.example.fakeestore.exceptions.AddressNotFoundException;
 import com.example.fakeestore.exceptions.UserNameNotFoundException;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -56,6 +58,7 @@ public class UserController {
         try {
 
             User user = modelMapper.map(userDto, User.class);
+            user.setOrders(new ArrayList<Order>());
             return new ResponseEntity(modelMapper.map(userService.createUser(user), UserDto.class), HttpStatus.CREATED);
 
         } catch (UserAllreadyExistsException e) {

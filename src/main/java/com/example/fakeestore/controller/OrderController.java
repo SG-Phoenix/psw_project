@@ -191,7 +191,7 @@ public class OrderController {
 
     }
 
-    private <PurchaseDto, OrderLine> Page<PurchaseDto> mapEntityPageIntoDtoPage(Page<OrderLine> entities, Class<PurchaseDto> dtoClass) {
+    private <Dto, Entity> Page<Dto> mapEntityPageIntoDtoPage(Page<Entity> entities, Class<Dto> dtoClass) {
         return entities.map(objectEntity -> modelMapper.map(objectEntity, dtoClass));
     }
 

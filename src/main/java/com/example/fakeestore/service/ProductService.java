@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class ProductService {
@@ -71,6 +72,28 @@ public class ProductService {
         Page<Product> pagedResult = productRepository.advancedFilter(name,barcode, qty, minPrice, maxPrice, category, pageable);
         return pagedResult;
 
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Product> getNewProducts()
+    {
+        Pageable pageable = PageRequest.of(0,5, Sort.by("id"));
+        Page<Product> pagedResult = productRepository.findByOrderByIdDesc(pageable);
+        return pagedResult;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Product> getRandomProducts()
+    {
+        long productCount = productRepository.count();
+        Long[] ids = new Long[5];
+        for(int i = 0;i<ids.length;i++)
+        {
+            ids[i] = new Random().nextLong(productCount);
+        }
+        Pageable pageable = PageRequest.of(0,5, Sort.by("id"));
+        Page<Product> pagedResult = productRepository.getRandomProducts(ids,pageable);
+        return pagedResult;
     }
 
     @Transactional

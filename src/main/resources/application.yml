@@ -24,7 +24,7 @@ server:
   port: 8081
 
 keycloak:
-  resource: fakeestore
+  resource: fakeestore-backend
 
 
 
