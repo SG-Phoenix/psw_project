@@ -39,12 +39,10 @@ public class OrderService {
     @Autowired
     OrderLineRepository orderLineRepository;
 
-    @Transactional(rollbackFor = { ProductChangedPrice.class, ProductNotEnoughtQuantity.class })
-    public Order createOrder(Order order) throws ProductNotEnoughtQuantity, ProductNotFoundException, ProductChangedPrice, UserIdNotFoundException {
+    @Transactional(rollbackFor = { ProductChangedPrice.class, ProductNotEnoughtQuantity.class})
+    public Order createOrder(Order order) throws ProductNotEnoughtQuantity, ProductChangedPrice {
 
         double totalPrice = 0;
-        User user = userService.getUserById(order.getUser().getId());
-        order.setUser(user);
         for(OrderLine pio : order.getProductsList())
         {
             pio.setOrder(order);

@@ -109,20 +109,12 @@ public class ProductService {
         return productRepository.save(productToUpdate);
     }
 
-    @Transactional
-    public Category createCategory(Category category) throws CategoryAllreadyExistsException {
-        if(categoryRepository.existsById(category.getName()))
-        {
-            throw new CategoryAllreadyExistsException(category.getName());
-        }
-
-        return categoryRepository.save(category);
-    }
 
     @Transactional(readOnly = true)
     public List<Category> getCategories() {
         return categoryRepository.findAll();
     }
+
     @Transactional(readOnly = true)
     public Category getCategory(String name) throws CategoryNotFoundException
     {
