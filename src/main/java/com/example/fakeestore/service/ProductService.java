@@ -38,7 +38,7 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long id) throws ProductNotFoundException {
         Product product = getProductById(id);
-        productRepository.delete(product);
+        product.setAvailable(false);
     }
 
     @Transactional(readOnly = true)
@@ -47,6 +47,9 @@ public class ProductService {
         Optional<Product> product = productRepository.findById(id);
 
         if(!product.isPresent())
+            throw new ProductNotFoundException(id);
+
+        if(!product.get().isAvailable())
             throw new ProductNotFoundException(id);
 
         return product.get();
@@ -102,6 +105,7 @@ public class ProductService {
         productToUpdate.setPrice(product.getPrice());
         productToUpdate.setQuantity(product.getQuantity());
         productToUpdate.setCategory(product.getCategory());
+        productToUpdate.setAvailable(product.isAvailable());
         return productRepository.save(productToUpdate);
     }
 

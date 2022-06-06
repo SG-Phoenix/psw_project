@@ -33,4 +33,7 @@ public class ProductDto {
     @JsonProperty(value = "brand")
     private String marca;
 
+    @JsonProperty(value = "available")
+    private boolean isAvailable;
+
 }
