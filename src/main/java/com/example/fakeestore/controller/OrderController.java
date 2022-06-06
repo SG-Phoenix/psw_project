@@ -80,6 +80,7 @@ public class OrderController {
 
             }
             order.setUser(user);
+            user.getOrders().add(order);
             order.setProductsList(orderLineList);
             return new ResponseEntity(orderService.createOrder(order), HttpStatus.CREATED);
         }catch(ProductNotFoundException e)

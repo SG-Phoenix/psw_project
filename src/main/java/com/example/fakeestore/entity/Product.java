@@ -63,7 +63,7 @@ public class Product {
     @Column(name = "creation_time")
     private Date creationDate;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonIgnore
     @ToString.Exclude
     private List<OrderLine> orderLines;
