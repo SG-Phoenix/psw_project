@@ -47,21 +47,24 @@ public class OrderService {
         {
             pio.setOrder(order);
             Product product = pio.getProduct();
-            if(Math.abs(product.getPrice() - pio.getPurchasePrice()) > 0.00000001)
+            if(Math.abs(product.getPrice() - pio.getPurchasePrice()) > 0.0001)
                 throw new ProductChangedPrice(product);
-            pio.setProduct(product);
+
 
             int newQty = product.getQuantity() - pio.getQuantity();
             if(newQty < 0)
                throw new ProductNotEnoughtQuantity(product, pio.getQuantity());
 
-           totalPrice += pio.getPurchasePrice()* pio.getQuantity();
+            product.getOrderLines().add(pio);
+            totalPrice += pio.getPurchasePrice()* pio.getQuantity();
 
            product.setQuantity(newQty);
         }
 
         order.setCreationDate(new Date());
         order.setTotalPrice(totalPrice);
+        User user = order.getUser();
+        user.getOrders().add(order);
         Order newOrder = orderRepository.save(order);
         return newOrder;
     }

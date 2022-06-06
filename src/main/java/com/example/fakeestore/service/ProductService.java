@@ -16,10 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -86,11 +84,9 @@ public class ProductService {
     public Page<Product> getRandomProducts()
     {
         long productCount = productRepository.count();
-        Long[] ids = new Long[5];
-        for(int i = 0;i<ids.length;i++)
-        {
-            ids[i] = new Random().nextLong(productCount);
-        }
+        long[] ids = new long[5];
+
+        ids = new Random().longs(1, productCount).distinct().limit(ids.length).toArray();
         Pageable pageable = PageRequest.of(0,5, Sort.by("id"));
         Page<Product> pagedResult = productRepository.getRandomProducts(ids,pageable);
         return pagedResult;

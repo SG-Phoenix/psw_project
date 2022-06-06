@@ -64,6 +64,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p " +
             "FROM Product p " +
             "WHERE (p.id in :idList)")
-    Page<Product> getRandomProducts(@Param(value = "idList")Long[] randId, Pageable pageable);
+    Page<Product> getRandomProducts(@Param(value = "idList")long[] randId, Pageable pageable);
 
 }
